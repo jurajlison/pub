@@ -10,6 +10,27 @@ MINECRAFT BACKUP SCRIPT - USAGE INSTRUCTIONS:
    - Periodic: Kept for 24 hours.
    - Daily: Kept for 14 days.
    - Monthly: Kept indefinitely.
+
+
+YAML block:
+backup:
+    image: python:3.11-slim
+    container_name: mc_backup
+    volumes:
+      # Read-only prístup k priečinkom podľa skriptu
+      - ./world:/data/world:ro
+      - ./mods:/data/mods:ro
+      # Úložisko pre generované zálohy
+      - ./backups:/backups
+    working_dir: /app
+    # Stiahne skript z tvojho GitHubu a spustí ho
+    entrypoint: >
+      /bin/sh -c "
+      apt-get update && apt-get install -y curl &&
+      curl -sSL https://raw.githubusercontent.com/jurajlison/pub/main/mcs_backup.py -o mcs_backup.py &&
+      python3 mcs_backup.py
+      "
+    restart: unless-stopped
 """
 
 import os
